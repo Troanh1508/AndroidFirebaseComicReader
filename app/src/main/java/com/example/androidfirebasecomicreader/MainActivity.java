@@ -1,22 +1,22 @@
 package com.example.androidfirebasecomicreader;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.androidfirebasecomicreader.Adapter.MyComicAdapter;
-import com.example.androidfirebasecomicreader.Interface.IComicLoadDone;
 import com.example.androidfirebasecomicreader.Model.Comic;
-import com.example.androidfirebasecomicreader.Common.Common;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,12 +26,15 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
+
     RecyclerView recycler_comic;
     TextView txt_comic;
 
     //Database
     DatabaseReference comics;
+
+
 
 
     @Override
@@ -44,16 +47,19 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         //Init Database
         comics = FirebaseDatabase.getInstance().getReference("Comic");
-
-        loadComic();
 
         recycler_comic = (RecyclerView) findViewById(R.id.recycler_comic);
         recycler_comic.setHasFixedSize(true);
         recycler_comic.setLayoutManager(new GridLayoutManager(this,2));
 
         txt_comic = (TextView) findViewById(R.id.txt_comic);
+
+        loadComic();
+
+
 
     }
 
@@ -67,18 +73,18 @@ public class MainActivity extends AppCompatActivity {
                     Comic comic = comicSnapShot.getValue(Comic.class);
                     comic_load.add(comic);
                 }
-                onComicLoadDoneListener(comic_load);
+                onLoadComic(comic_load);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(MainActivity.this, error.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
-    public void onComicLoadDoneListener(List<Comic> comicList) {
+    public void onLoadComic(List<Comic> comicList) {
         Common.comicList = comicList;
 
         recycler_comic.setAdapter(new MyComicAdapter(getBaseContext(),comicList));
@@ -86,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         txt_comic.setText(new StringBuilder("NEW COMIC (")
         .append(comicList.size())
         .append(")"));
+
 
 
     }

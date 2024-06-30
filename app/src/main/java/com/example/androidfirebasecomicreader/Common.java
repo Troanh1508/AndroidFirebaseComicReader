@@ -1,4 +1,4 @@
-package com.example.androidfirebasecomicreader.Common;
+package com.example.androidfirebasecomicreader;
 
 import com.example.androidfirebasecomicreader.Model.Comic;
 
